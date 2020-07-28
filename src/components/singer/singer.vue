@@ -23,9 +23,9 @@ export default {
     async _getSingerList () {
       let res = await getSingerList()
       if (res.code === ERR_OK) {
-        console.log(res.data)
+        // console.log(res.data)
         this.singers = this._normalizeSinger(res.data.list)
-        console.log(this.singers)
+        // console.log(this.singers)
       }
     },
     //                Farea: "1"
