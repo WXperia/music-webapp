@@ -6,12 +6,21 @@
         <h1 class="title" v-html="title">
         </h1>
         <div class="bg-image" :style="bgStyle" ref="bgImage">
-            <div class="filter"></div>
+            <div class="play-wrapper">
+                <div ref="playBtn" v-show="songs.length>0" class="play" @click="random">
+                    <i class="icon-play"></i>
+                    <span class="text">随机播放全部</span>
+                </div>
+        </div>
+            <div class="filter" ref="filter"></div>
         </div>
         <div class="bg-layer" ref="layer"></div>
         <scroll :data="songs"  @scroll="onScroll" :probeType="probeType" class="list" ref="list" :listenScroll="listenScroll">
             <div class="song-list-wrapper">
                 <song-list :songs="songs" @select="selectSong"></song-list>
+            </div>
+            <div>
+                <loading v-show="!songs.length > 0"></loading>
             </div>
         </scroll>
     </div>
@@ -19,12 +28,12 @@
 <script>
 import Scroll from '@/base/scroll/scroll.vue'
 import SongList from '@/base/song-list/song-list.vue'
-// eslint-disable-next-line no-unused-vars
 import { prefixStyle } from 'common/js/dom'
+import Loading from '@/base/loading/loading.vue'
 // import { playlistMixin } from 'common/js/mixin'
 const RESERVED_HEIGHT = 40
-// const transform = prefixStyle('transform')
-// const backdrop = prefixStyle('backdrop-filter')
+const transform = prefixStyle('transform')
+const backdrop = prefixStyle('backdrop-filter')
     export default {
         data () {
             return {
@@ -65,14 +74,17 @@ const RESERVED_HEIGHT = 40
                 this.scrollY = pos.y
             },
             back () {
-                this.$router.push('/singer')
+                this.$router.back()
             },
             selectSong (song, index) {
                 console.log(song, index)
+            },
+            random () {
+
             }
         },
         components: {
-            Scroll, SongList
+            Scroll, SongList, Loading
         },
         watch: {
             scrollY (newY) {
@@ -81,8 +93,8 @@ const RESERVED_HEIGHT = 40
                 let zIndex = 0
                 let scale = 1
                 let blur = 0
-                this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
-                this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`
+                this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
+                // this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`
                 const percent = Math.abs(newY / this.imageHeight)
                 if (newY > 0) {
                     scale = 1 + percent
@@ -90,18 +102,20 @@ const RESERVED_HEIGHT = 40
                 } else {
                     blur = Math.min(20 * percent, 20)
                 }
-                this.$refs.filter.style['backdrop-filter'] = `blur(${blur})`
+                this.$refs.filter.style[backdrop] = `blur(${blur})`
                 if (newY < this.minTranslate) {
                     zIndex = 10
                     this.$refs.bgImage.style.paddingTop = 0
                     this.$refs.bgImage.style.height = RESERVED_HEIGHT + 'px'
+                    this.$refs.playBtn.style.display = 'none'
                 } else {
                     this.$refs.bgImage.style.paddingTop = '70%'
                     this.$refs.bgImage.style.height = 0
+                     this.$refs.playBtn.style.display = 'block'
                 }
                 this.$refs.bgImage.style.zIndex = zIndex
-                this.$refs.bgImage.style['transform'] = `scale(${scale})`
-                this.$refs.bgImage.style['webkitTransform'] = `scale(${scale})`
+                this.$refs.bgImage.style[transform] = `scale(${scale})`
+                // this.$refs.bgImage.style['webkitTransform'] = `scale(${scale})`
             }
         }
     }
