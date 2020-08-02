@@ -7,7 +7,7 @@ const Recommend = () => import('components/recommend/recommend.vue')
 const Singer = () => import('components/singer/singer.vue')
 const Rank = () => import('components/rank/rank.vue')
 const Search = () => import('components/search/search.vue')
-// const SingerDetail = () => import('components/singer-detail/singer-detail')
+const SingerDetail = () => import('components/singer-detail/singer-detail')
 // const Disc = () => import('components/disc/disc')
 // const TopList = () => import('components/top-list/top-list')
 // const UserCenter = () => import('components/user-center/user-center')
@@ -30,13 +30,13 @@ export default new Router({
     },
     {
       path: '/singer',
-      component: Singer
-    //   children: [
-    //     {
-    //       path: ':id',
-    //       component: SingerDetail
-    //     }
-    //   ]
+      component: Singer,
+      children: [
+        {
+          path: ':id',
+          component: SingerDetail
+        }
+      ]
     },
     {
       path: '/rank',

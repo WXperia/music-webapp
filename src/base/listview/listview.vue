@@ -22,6 +22,7 @@
             v-for="(item, index) in group.items"
             :key="index"
             class="list-group-item"
+            @click="selectItem(item)"
           >
             <img class="avatar" v-lazy="item.avatar" />
             <span class="name">{{ item.name }}</span>
@@ -95,6 +96,9 @@ export default {
     }
   },
   methods: {
+    selectItem (item) {
+      this.$emit('select', item)
+    },
     onShortcutTouchStart (e) {
       let anchorIndex = getData(e.target, 'index')
       let firstTouch = e.touches[0]
@@ -207,7 +211,7 @@ export default {
         font-size: $font-size-medium
   .list-shortcut
     position: fixed
-    z-index: 30
+    z-index: 10
     right: 0
     top: 55%
     transform: translateY(-50%)
