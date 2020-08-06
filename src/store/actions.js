@@ -1,4 +1,4 @@
-// import * as types from './mutation-types'
+import * as types from './mutation-types'
 // import { playMode } from 'common/js/config'
 // import { shuffle } from 'common/js/util'
 // import { saveSearch, clearSearch, deleteSearch, savePlay, saveFavorite, deleteFavorite } from 'common/js/cache'
@@ -130,3 +130,10 @@
 // export const deleteFavoriteList = function ({ commit }, song) {
 //   commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
 // }
+export const selectPlay = function ({ commit, state }, { list, index }) {
+    commit(types.SET_SEQUENCE_LIST, list)
+    commit(types.SET_PLAYLIST, list)
+    commit(types.SET_CURRENT_INDEX, index)
+    commit(types.SET_FULL_SCREEN, true)
+    commit(types.SET_PLAYING_STATE, true)
+}

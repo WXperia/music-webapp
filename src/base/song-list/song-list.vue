@@ -28,8 +28,8 @@ export default {
         }
     },
     methods: {
-        selectItem (item, index) {
-            this.$emit('select', item, index)
+        selectItem (song, index) {
+            this.$emit('select', song, index)
         },
         getDesc (song) {
             return `${song.singer}·${song.album}`

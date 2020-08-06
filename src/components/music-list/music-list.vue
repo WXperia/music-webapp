@@ -30,6 +30,7 @@ import Scroll from '@/base/scroll/scroll.vue'
 import SongList from '@/base/song-list/song-list.vue'
 import { prefixStyle } from 'common/js/dom'
 import Loading from '@/base/loading/loading.vue'
+import { mapActions } from 'vuex'
 // import { playlistMixin } from 'common/js/mixin'
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -78,10 +79,15 @@ const backdrop = prefixStyle('backdrop-filter')
             },
             selectSong (song, index) {
                 console.log(song, index)
+                this.selectPlay({
+                    list: this.songs,
+                    index
+                })
             },
             random () {
 
-            }
+            },
+            ...mapActions(['selectPlay'])
         },
         components: {
             Scroll, SongList, Loading
