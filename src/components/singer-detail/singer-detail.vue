@@ -8,7 +8,7 @@
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from '@/api/singer.js'
 import { ERR_OK } from 'api/config'
-import { createSong } from 'common/js/song.js'
+import { createSong, processSongsUrl } from 'common/js/song.js'
 import musicList from '@/components/music-list/music-list.vue'
 export default {
   data () {
@@ -29,8 +29,7 @@ export default {
           }
           let res = await getSingerDetail(this.singer.id)
           if (res.code === ERR_OK) {
-              this.songs = this._normalizeSongs(res.data.list)
-              console.log(this.songs)
+              this.songs = await processSongsUrl(this._normalizeSongs(res.data.list))
           }
       },
       _normalizeSongs (list) {

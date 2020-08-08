@@ -30,7 +30,7 @@ import Scroll from '@/base/scroll/scroll.vue'
 import SongList from '@/base/song-list/song-list.vue'
 import { prefixStyle } from 'common/js/dom'
 import Loading from '@/base/loading/loading.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 // import { playlistMixin } from 'common/js/mixin'
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -61,6 +61,7 @@ const backdrop = prefixStyle('backdrop-filter')
             this.probeType = 3
         },
         computed: {
+            ...mapGetters(['playing']),
             bgStyle () {
                 return `background:  no-repeat center/100% url(${this.bgImage})`
             }
@@ -93,6 +94,11 @@ const backdrop = prefixStyle('backdrop-filter')
             Scroll, SongList, Loading
         },
         watch: {
+            playing () {
+                this.$nextTick(() => {
+                    this.$refs.list.refresh()
+                })
+            },
             scrollY (newY) {
                 // 限制最多滚动到this.minTranslate
                 let translateY = Math.max(this.minTranslate, newY)
