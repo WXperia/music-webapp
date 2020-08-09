@@ -50,15 +50,7 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
       this._initScroll()
-      if (this.listenScroll) {
-      let vue = this
-      this.scroll.on('scroll', (pos) => {
-        vue.$emit('scroll', pos)
-      })
-    }
-    }, 20)
   },
   methods: {
     _initScroll () {

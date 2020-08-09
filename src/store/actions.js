@@ -137,3 +137,8 @@ export const selectPlay = function ({ commit, state }, { list, index }) {
     commit(types.SET_FULL_SCREEN, true)
     commit(types.SET_PLAYING_STATE, true)
 }
+
+export const changePlaySong = function ({ commit, state }, index) {
+    commit(types.SET_READYPLAY_STATE, false)
+    commit(types.SET_CURRENT_INDEX, index)
+}

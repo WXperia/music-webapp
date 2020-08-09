@@ -21,7 +21,7 @@
         <div class="middle">
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd" ref="imageWrapper">
+              <div class="cd" ref="imageWrapper" :class="cdCls">
                 <img
                   :src="currentSong.image"
                   ref="image"
@@ -49,16 +49,16 @@
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i class="icon-prev needclick"  @click="prev" ></i>
             </div>
-            <div class="icon i-center">
-              <i class="needsclick" :class="playIcon" @click="togglePlaying"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i class="needsclick needclick" :class="playIcon" @click="togglePlaying" ></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i class="icon-next needclick" @click="next"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right" :class="disableCls">
               <i class="icon icon-not-favorite"></i>
             </div>
           </div>
@@ -68,12 +68,13 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <div class="imgWrapper" ref="miniWrapper">
+          <div class="imgWrapper" ref="miniWrapper" >
             <img
               ref="miniImage"
               width="40"
               height="40"
               :src="currentSong.image"
+              :class="cdCls"
             />
           </div>
         </div>
@@ -81,17 +82,19 @@
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-
+        <div class="control" :class="disableCls">
+          <i  @click.stop="togglePlaying" :class="minIcon" ></i>
+        </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <audio  ref="audio" :src="currentSong.url"></audio>
+    <audio  ref="audio" :src="currentSong.url" @canplay="audioCanplay" @error="audioError"></audio>
   </div>
 </template>
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 const transform = prefixStyle('transform')
@@ -102,8 +105,19 @@ export default {
   methods: {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-      setPlayingState: 'SET_PLAYING_STATE'
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setReadyPlayState: 'SET_READYPLAY_STATE'
     }),
+    ...mapActions([
+      'changePlaySong'
+    ]),
+    audioCanplay () {
+      this.setReadyPlayState(true)
+    },
+    audioError () {
+      this.setReadyPlayState(false)
+    },
     togglePlaying () {
       this.setPlayingState(!this.playing)
     },
@@ -112,6 +126,22 @@ export default {
     },
     open () {
       this.setFullScreen(true)
+    },
+    prev () {
+      if (!this.readyPlay) return
+      let index = this.currentIndex - 1
+      if (index < 0) {
+        index = this.playlist.length - 1
+      }
+      this.changePlaySong(index)
+    },
+    next () {
+      if (!this.readyPlay) return
+      let index = this.currentIndex + 1
+      if (index > this.playlist.length - 1) {
+        index = 0
+      }
+      this.changePlaySong(index)
     },
     enter (el, done) {
       const { x, y, scale } = this._getPosAndScale()
@@ -181,9 +211,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['fullScreen', 'playlist', 'currentSong', 'playing']),
+    ...mapGetters(['fullScreen', 'playlist', 'currentSong', 'playing', 'currentIndex', 'readyPlay']),
     playIcon () {
         return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    minIcon () {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    cdCls () {
+      return this.playing ? 'play' : 'play pause'
+    },
+    disableCls () {
+      return this.readyPlay ? '' : 'disable'
     }
   }
 }
@@ -262,6 +301,10 @@ export default {
             width: 100%
             height: 100%
             border-radius: 50%
+            &.play
+                animation: rotate 20s linear infinite
+            &.pause
+                animation-play-state: paused
             .image
               position: absolute
               left: 0
@@ -271,8 +314,6 @@ export default {
               box-sizing: border-box
               border-radius: 50%
               border: 10px solid rgba(255, 255, 255, 0.1)
-            .play
-              animation: rotate 20s linear infinite
         .playing-lyric-wrapper
           width: 80%
           margin: 30px auto 0 auto

@@ -36,6 +36,9 @@ const mutations = {
   },
   [types.SET_FAVORITE_LIST] (state, list) {
     state.favoriteList = list
+  },
+  [types.SET_READYPLAY_STATE] (state, readyPlay) {
+    state.readyPlay = readyPlay
   }
 }
 
