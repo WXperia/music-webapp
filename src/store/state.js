@@ -7,7 +7,7 @@ const state = {
   fullScreen: false,
   playlist: [], // 播放列表
   sequenceList: [], // 顺序列表
-  mode: playMode.sequence,
+  mode: playMode.sequence, // 播放模式
   currentIndex: -1, // 当前播放的是哪首歌
   disc: {},
   topList: {},

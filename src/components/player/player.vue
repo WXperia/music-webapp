@@ -41,19 +41,28 @@
             <span class="dot"></span>
           </div>
           <div class="progress-wrapper">
-            <span class="time time-l"></span>
-            <div class="progress-bar-wrapper"></div>
-            <span class="time time-r"></span>
+            <span class="time time-l">{{ format(currentTime) }}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar
+                @percentChange="onpercentChange"
+                :percent="percent"
+              ></progress-bar>
+            </div>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
             <div class="icon i-left">
-              <i class="icon-sequence"></i>
+              <i :class="iconMode" @click="changeMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
-              <i class="icon-prev needclick"  @click="prev" ></i>
+              <i class="icon-prev needclick" @click="prev"></i>
             </div>
             <div class="icon i-center" :class="disableCls">
-              <i class="needsclick needclick" :class="playIcon" @click="togglePlaying" ></i>
+              <i
+                class="needsclick needclick"
+                :class="playIcon"
+                @click="togglePlaying"
+              ></i>
             </div>
             <div class="icon i-right" :class="disableCls">
               <i class="icon-next needclick" @click="next"></i>
@@ -68,7 +77,7 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <div class="imgWrapper" ref="miniWrapper" >
+          <div class="imgWrapper" ref="miniWrapper">
             <img
               ref="miniImage"
               width="40"
@@ -83,35 +92,73 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control" :class="disableCls">
-          <i  @click.stop="togglePlaying" :class="minIcon" ></i>
+          <progress-circle :percent="percent">
+            <i
+              class="icon-mini"
+              @click.stop="togglePlaying"
+              :class="minIcon"
+            ></i
+          ></progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <audio  ref="audio" :src="currentSong.url" @canplay="audioCanplay" @error="audioError"></audio>
+    <audio
+      ref="audio"
+      :src="currentSong.url"
+      @canplay="audioCanplay"
+      @error="audioError"
+      @timeupdate="upDateTime"
+    ></audio>
   </div>
 </template>
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
+import { playMode } from 'common/js/config'
+import ProgressBar from 'base/progress-bar/progress-bar'
+import ProgressCircle from 'base/progress-circle/progress-circle'
 const transform = prefixStyle('transform')
 export default {
   data () {
-    return {}
+    return {
+      currentTime: 0
+    }
   },
   methods: {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
-      setReadyPlayState: 'SET_READYPLAY_STATE'
+      setReadyPlayState: 'SET_READYPLAY_STATE',
+      setPlayMode: 'SET_PLAY_MODE'
     }),
-    ...mapActions([
-      'changePlaySong'
-    ]),
+    ...mapActions(['changePlaySong']),
+    changeMode () {
+      const mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
+    },
+    onpercentChange (percent) {
+      console.log(percent)
+      this.$refs.audio.currentTime = percent * this.currentSong.duration
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+    },
+    format (interval) {
+      interval = interval | 0
+      const minute = (interval / 60) | 0
+      const second = interval % 60
+
+      return `${this._pad(minute)}:${this._pad(second)}`
+    },
+
+    upDateTime (e) {
+      this.currentTime = e.target.currentTime
+    },
     audioCanplay () {
       this.setReadyPlayState(true)
     },
@@ -145,7 +192,7 @@ export default {
     },
     enter (el, done) {
       const { x, y, scale } = this._getPosAndScale()
-       console.log(x, y)
+      console.log(x, y)
       let animation = {
         0: {
           transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
@@ -181,6 +228,14 @@ export default {
       this.$refs.cdWrapper.style.transition = ''
       this.$refs.cdWrapper.style[transform] = ''
     },
+    _pad (num, n = 2) {
+      let len = num.toString().length
+      while (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
+    },
     _getPosAndScale () {
       const targetWidth = 40
       const paddingLeft = 30
@@ -211,9 +266,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['fullScreen', 'playlist', 'currentSong', 'playing', 'currentIndex', 'readyPlay']),
+    ...mapGetters([
+      'fullScreen',
+      'playlist',
+      'currentSong',
+      'playing',
+      'currentIndex',
+      'readyPlay',
+      'mode'
+    ]),
     playIcon () {
-        return this.playing ? 'icon-pause' : 'icon-play'
+      return this.playing ? 'icon-pause' : 'icon-play'
     },
     minIcon () {
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
@@ -223,7 +286,21 @@ export default {
     },
     disableCls () {
       return this.readyPlay ? '' : 'disable'
+    },
+    percent () {
+      return this.currentTime / this.currentSong.duration
+    },
+    iconMode () {
+      return this.mode === playMode.sequence
+        ? 'icon-sequence'
+        : this.mode === playMode.loop
+        ? 'icon-loop'
+        : 'icon-random'
     }
+  },
+  components: {
+    ProgressBar,
+    ProgressCircle
   }
 }
 </script>
