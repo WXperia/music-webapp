@@ -18,7 +18,11 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
+        <div class="middle"
+             @touchstart.prevent='middleTouchStart'
+             @touchmove.prevent="middleTouchMove"
+             @touchend="middleTouchEnd"
+        >
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" ref="imageWrapper" :class="cdCls">
@@ -34,11 +38,20 @@
               <div class="playing-lyric"></div>
             </div>
           </div>
+          <Scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p class="text" :class="{'current':currentLineNum === index}" :key="index" v-for="(line,index) in currentLyric.lines" ref="lyricLine">
+                  {{line.txt}}
+                </p>
+              </div>
+            </div>
+          </Scroll>
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-            <span class="dot"></span>
-            <span class="dot"></span>
+            <span class="dot" :class="{'active':currentShow === 'cd'}"></span>
+            <span class="dot" :class="{'active':currentShow === 'lyric'}"></span>
           </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{ format(currentTime) }}</span>
@@ -111,6 +124,7 @@
       @canplay="audioCanplay"
       @error="audioError"
       @timeupdate="upDateTime"
+      @ended="end"
     ></audio>
   </div>
 </template>
@@ -120,13 +134,23 @@ import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import { playMode } from 'common/js/config'
 import ProgressBar from 'base/progress-bar/progress-bar'
+import { shuffle } from 'common/js/util'
+// import { getLyric } from 'api/song'
+import Lyric from 'lyric-parser'
+import Scroll from 'base/scroll/scroll'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 const transform = prefixStyle('transform')
 export default {
   data () {
     return {
-      currentTime: 0
+      currentTime: 0,
+      currentLyric: null,
+      currentLineNum: 0,
+      currentShow: 'cd'
     }
+  },
+  created () {
+    this.touch = {}
   },
   methods: {
     ...mapMutations({
@@ -134,12 +158,69 @@ export default {
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
       setReadyPlayState: 'SET_READYPLAY_STATE',
-      setPlayMode: 'SET_PLAY_MODE'
+      setPlayMode: 'SET_PLAY_MODE',
+      setSequenceList: 'SET_SEQUENCE_LIST',
+      setPlayList: 'SET_PLAYLIST'
     }),
     ...mapActions(['changePlaySong']),
+    middleTouchStart (e) {
+      this.touch.initiated = true
+      const touches = e.touches[0]
+      this.touch.startX = touches.pageX
+      this.touch.startY = touches.pageY
+    },
+    middleTouchMove (e) {
+      console.log('move')
+      if (!this.touch.initiated) {
+        return false
+      }
+      const touches = e.touches[0]
+      const deltaX = touches.pageX - this.touch.startX
+      const deltaY = touches.pageY - this.touch.startY
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        return false
+      }
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
+       const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX))
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+    },
+    middleTouchEnd (e) {
+
+    },
+    async getLyric () {
+      let res = await this.currentSong.getLyric()
+      this.currentLyric = new Lyric(res, this.handleLyric)
+      if (this.playing) {
+        this.currentLyric.play()
+        }
+      console.log(this.currentLyric)
+    },
+    handleLyric ({ lineNum, txt }) {
+      this.currentLineNum = lineNum
+      if (lineNum > 5) {
+        let lineEl = this.$refs.lyricLine[lineNum - 5]
+        this.$refs.lyricList.scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
+      }
+    },
     changeMode () {
       const mode = (this.mode + 1) % 3
       this.setPlayMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+         list = shuffle(this.sequenceList)
+      } else {
+         list = this.sequenceList
+      }
+        this.resetCurrentIndex(list)
+        this.setPlayList(list)
+    },
+    resetCurrentIndex (list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
     },
     onpercentChange (percent) {
       console.log(percent)
@@ -182,13 +263,24 @@ export default {
       }
       this.changePlaySong(index)
     },
+    end () {
+      this.next()
+    },
+    loop () {
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
+    },
     next () {
       if (!this.readyPlay) return
-      let index = this.currentIndex + 1
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
       if (index > this.playlist.length - 1) {
         index = 0
       }
       this.changePlaySong(index)
+      }
     },
     enter (el, done) {
       const { x, y, scale } = this._getPosAndScale()
@@ -253,8 +345,10 @@ export default {
     }
   },
   watch: {
-    currentSong () {
+    currentSong (newSong, oldSong) {
+      if (newSong.id === oldSong) return
       this.$nextTick(() => {
+        this.getLyric()
         this.$refs.audio.play()
       })
     },
@@ -273,7 +367,8 @@ export default {
       'playing',
       'currentIndex',
       'readyPlay',
-      'mode'
+      'mode',
+      'sequenceList'
     ]),
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -300,7 +395,8 @@ export default {
   },
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   }
 }
 </script>

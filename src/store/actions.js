@@ -1,13 +1,13 @@
 import * as types from './mutation-types'
-// import { playMode } from 'common/js/config'
-// import { shuffle } from 'common/js/util'
+import { playMode } from 'common/js/config'
+import { shuffle } from 'common/js/util'
 // import { saveSearch, clearSearch, deleteSearch, savePlay, saveFavorite, deleteFavorite } from 'common/js/cache'
 
-// function findIndex (list, song) {
-//   return list.findIndex((item) => {
-//     return item.id === song.id
-//   })
-// }
+function findIndex (list, song) {
+  return list.findIndex((item) => {
+    return item.id === song.id
+  })
+}
 
 // export const selectPlay = function ({ commit, state }, { list, index }) {
 //   commit(types.SET_SEQUENCE_LIST, list)
@@ -132,10 +132,24 @@ import * as types from './mutation-types'
 // }
 export const selectPlay = function ({ commit, state }, { list, index }) {
     commit(types.SET_SEQUENCE_LIST, list)
-    commit(types.SET_PLAYLIST, list)
+    if (state.mode === playMode.random) {
+        // let randomList = shuffle(list)
+        // commit(types.SET_PLAYLIST, randomList)
+        index = findIndex(state.playlist, list[index])
+    } else {
+        commit(types.SET_PLAYLIST, list)
+    }
     commit(types.SET_CURRENT_INDEX, index)
     commit(types.SET_FULL_SCREEN, true)
     commit(types.SET_PLAYING_STATE, true)
+}
+export const randomPlay = function ({ commit, state }, { list }) {
+    commit(types.SET_PLAY_MODE, playMode.random)
+    commit(types.SET_SEQUENCE_LIST, list)
+    let randomList = shuffle(list)
+    commit(types.SET_PLAYLIST, randomList)
+    commit(types.SET_FULL_SCREEN, true)
+    commit(types.SET_PLAY_MODE, true)
 }
 
 export const changePlaySong = function ({ commit, state }, index) {
