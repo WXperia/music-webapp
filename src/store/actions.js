@@ -155,4 +155,5 @@ export const randomPlay = function ({ commit, state }, { list }) {
 export const changePlaySong = function ({ commit, state }, index) {
     commit(types.SET_READYPLAY_STATE, false)
     commit(types.SET_CURRENT_INDEX, index)
+    commit(types.SET_PLAYING_STATE, true)
 }
