@@ -140,6 +140,9 @@ export default {
         this.heightList.push(height)
         // console.log(this.heightList)
       }
+    },
+    refresh () {
+      this.$refs.listview.refresh()
     }
   },
   components: {
