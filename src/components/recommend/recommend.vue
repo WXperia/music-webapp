@@ -64,9 +64,10 @@ export default {
   },
   methods: {
     selectItem (item) {
-      this.$router.push({
-        path: `/recomend/${item.dissid}`
-      })
+       this.$router.push({
+          path: `/recommend/${item.dissid}`
+        })
+        this.setDisc(item)
     },
     handlePlaylist (playlist) {
       const bottom = playlist.length > 0 ? '60px' : ''
