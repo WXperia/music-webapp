@@ -9,7 +9,7 @@ const Rank = () => import('components/rank/rank.vue')
 const Search = () => import('components/search/search.vue')
 const SingerDetail = () => import('components/singer-detail/singer-detail')
 const Disc = () => import('components/disc/disc')
-// const TopList = () => import('components/top-list/top-list')
+const TopList = () => import('components/top-list/top-list')
 // const UserCenter = () => import('components/user-center/user-center')
 
 export default new Router({
@@ -40,13 +40,13 @@ export default new Router({
     },
     {
       path: '/rank',
-      component: Rank
-    //   children: [
-    //     {
-    //       path: ':id',
-    //       component: TopList
-    //     }
-    //   ]
+      component: Rank,
+      children: [
+        {
+          path: ':id',
+          component: TopList
+        }
+      ]
     },
     {
       path: '/search',

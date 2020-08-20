@@ -23,7 +23,7 @@ export const readyPlay = (state) => {
 }
 export const disc = state => state.disc
 
-// export const topList = state => state.topList
+export const topList = state => state.topList
 
 // export const searchHistory = state => state.searchHistory
 

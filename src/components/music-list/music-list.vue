@@ -17,7 +17,7 @@
         <div class="bg-layer" ref="layer"></div>
         <scroll :data="songs"  @scroll="onScroll" :probeType="probeType" class="list" ref="list" :listenScroll="listenScroll">
             <div class="song-list-wrapper">
-                <song-list :songs="songs" @select="selectSong"></song-list>
+                <song-list :rank="rank" :songs="songs" @select="selectSong"></song-list>
             </div>
             <div>
                 <loading v-show="!songs.length > 0"></loading>
@@ -55,7 +55,12 @@ const backdrop = prefixStyle('backdrop-filter')
             title: {
                 type: String,
                 default: ''
+            },
+            rank: {
+                type: Boolean,
+                default: false
             }
+
         },
         created () {
             this.listenScroll = true
