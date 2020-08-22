@@ -157,3 +157,37 @@ export const changePlaySong = function ({ commit, state }, index) {
     commit(types.SET_CURRENT_INDEX, index)
     commit(types.SET_PLAYING_STATE, true)
 }
+
+export const insertSong = function ({ commit, state }, song) {
+    let playlist = state.playlist.slice()
+    let sequenceList = state.sequenceList.slice()
+    let currentIndex = state.currentIndex
+    // 获取当前播放的歌曲
+    let currentSong = playlist[currentIndex]
+    let fpIndex = findIndex(playlist, song)
+    // 插入歌曲，索引加1
+    currentIndex++
+    // 如果已经有了这首歌
+    if (currentIndex > fpIndex) {
+        playlist.splice(fpIndex, 1)
+        currentIndex--
+    } else {
+        playlist.splice(fpIndex + 1, 1)
+    }
+
+    let currentSIndex = findIndex(sequenceList, currentSong) + 1
+    let fsIndex = findIndex(sequenceList, song)
+    sequenceList.splice(currentSIndex, 0, song)
+    if (fsIndex > -1) {
+        if (currentSIndex > fsIndex) {
+            // [1,2,3,fsIndex,song]
+            sequenceList.splice(fsIndex, 1)
+        } else {
+            // [1,2,3,song,fsIndex]
+            sequenceList.splice(fsIndex + 1, 1)
+        }
+    }
+    commit(types.SET_PLAYLIST, playlist)
+    commit(types.SET_SEQUENCE_LIST, sequenceList)
+    commit(types.SET_CURRENT_INDEX, currentIndex)
+}

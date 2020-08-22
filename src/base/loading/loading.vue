@@ -20,6 +20,8 @@
   .loading
     width: 100%
     text-align: center
+    img
+      width: 40px
     .desc
       line-height: 20px
       font-size: $font-size-small
