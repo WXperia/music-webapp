@@ -12,4 +12,4 @@ export const options = {
 }
 export const ERR_OK = 0
 
-export const MY_PATH = 'http://music.wxperia.com:9000'
+export const MY_PATH = 'http://music.wxperia.com'
