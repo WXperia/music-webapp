@@ -25,7 +25,7 @@ export const disc = state => state.disc
 
 export const topList = state => state.topList
 
-// export const searchHistory = state => state.searchHistory
+export const searchHistory = state => state.searchHistory
 
 // export const playHistory = (state) => {
 //   return state.playHistory.map((song) => {

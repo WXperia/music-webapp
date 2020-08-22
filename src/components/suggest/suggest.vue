@@ -61,7 +61,6 @@ export default {
         this.$emit('listScroll')
     },
     selectItem (item) {
-      console.log(item)
       if (item.type === TYPE_SINGER) {
         const singer = new Singer({
           id: item.singermid,
@@ -74,6 +73,7 @@ export default {
       } else {
         this.insertSong(item)
       }
+      this.$emit('select', item)
     },
     async searchMore () {
       if (!this.hasMore) {

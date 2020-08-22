@@ -1,4 +1,4 @@
-import { commonParams, MY_PATH} from './config'
+import { commonParams, MY_PATH } from './config'
 import { getUid } from 'common/js/uid'
 import axios from 'axios'
 import { ERR_OK } from 'api/config'
