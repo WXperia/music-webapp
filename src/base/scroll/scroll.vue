@@ -1,12 +1,11 @@
 <template>
   <div ref="wrapper">
-    <slot></slot>
+    <slot v-show="data.length > 0"></slot>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import BScroll from 'better-scroll'
-
 const DIRECTION_H = 'horizontal'
 const DIRECTION_V = 'vertical'
 
@@ -115,6 +114,8 @@ export default {
         this.refresh()
       }, this.refreshDelay)
     }
+  },
+  components: {
   }
 }
 </script>

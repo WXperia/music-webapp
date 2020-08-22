@@ -408,6 +408,7 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
+      this.playingLyric = ''
       if (newSong.id === oldSong) return
       if (this.currentLyric) {
         this.currentLyric.stop()

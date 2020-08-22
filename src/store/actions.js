@@ -168,13 +168,15 @@ export const insertSong = function ({ commit, state }, song) {
     // 插入歌曲，索引加1
     currentIndex++
     // 如果已经有了这首歌
-    if (currentIndex > fpIndex) {
-        playlist.splice(fpIndex, 1)
-        currentIndex--
-    } else {
-        playlist.splice(fpIndex + 1, 1)
+    playlist.splice(currentIndex, 0, song)
+    if (fpIndex > -1) {
+        if (currentIndex > fpIndex) {
+            playlist.splice(fpIndex, 1)
+            currentIndex--
+        } else {
+            playlist.splice(fpIndex + 1, 1)
+        }
     }
-
     let currentSIndex = findIndex(sequenceList, currentSong) + 1
     let fsIndex = findIndex(sequenceList, song)
     sequenceList.splice(currentSIndex, 0, song)
@@ -190,4 +192,6 @@ export const insertSong = function ({ commit, state }, song) {
     commit(types.SET_PLAYLIST, playlist)
     commit(types.SET_SEQUENCE_LIST, sequenceList)
     commit(types.SET_CURRENT_INDEX, currentIndex)
+    commit(types.SET_FULL_SCREEN, true)
+    commit(types.SET_PLAYING_STATE, true)
 }

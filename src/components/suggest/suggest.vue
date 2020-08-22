@@ -1,5 +1,5 @@
 <template>
-  <scroll ref="suggest" class="suggest" @scrollToEnd="searchMore" :data="result" :pullup="pullup">
+  <scroll @beforeScroll="listScroll" :beforeScroll="beforeScroll" ref="suggest" class="suggest" @scrollToEnd="searchMore" :data="result" :pullup="pullup">
     <ul class="suggest-list">
       <li
         class="suggest-item"
@@ -16,6 +16,9 @@
       </li>
       <loading v-show="hasMore"></loading>
     </ul>
+    <div v-show="!hasMore && !result.length > 0" class="no-result-wrapper">
+        <no-result :title="title"/>
+    </div>
   </scroll>
 </template>
 
@@ -27,6 +30,7 @@ import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import Singer from 'common/js/singer'
 import { mapMutations, mapActions } from 'vuex'
+import noResult from 'base/no-result/no-result'
 const TYPE_SINGER = 'singer'
 const perpage = 20
 export default {
@@ -47,10 +51,15 @@ export default {
       page: 1,
       result: [],
       pullup: true,
-      hasMore: true
+      hasMore: true,
+      title: '抱歉，暂无搜索结果',
+      beforeScroll: true
     }
   },
   methods: {
+    listScroll () {
+        this.$emit('listScroll')
+    },
     selectItem (item) {
       console.log(item)
       if (item.type === TYPE_SINGER) {
@@ -74,8 +83,11 @@ export default {
       try {
         let res = await search(this.query, this.page, this.showSinger, perpage)
         if (res.code === ERR_OK) {
-          this._checkMore(res.data)
-          this.result = this.result.concat(this._genResult(res.data))
+          let songs = await this._genResult(res.data)
+          this.result = this.result.concat(songs)
+          setTimeout(() => {
+            this._checkMore(res.data)
+          }, 20)
         }
       } catch (error) {
         throw Error(error)
@@ -88,8 +100,10 @@ export default {
       try {
         let res = await search(this.query, this.page, this.showSinger, perpage)
         if (res.code === ERR_OK) {
-          this.result = this._genResult(res.data)
-          this._checkMore(res.data)
+          this.result = await this._genResult(res.data)
+          setTimeout(() => {
+            this._checkMore(res.data)
+          }, 20)
         }
       } catch (e) {
         throw Error(e)
@@ -124,7 +138,7 @@ export default {
           throw Error(error)
         }
       }
-      console.log(ret)
+    //   console.log(ret)
       return ret
     },
     _normalizeSongs (list) {
@@ -160,7 +174,8 @@ export default {
   },
   components: {
     Scroll,
-    Loading
+    Loading,
+    noResult
   }
 }
 </script>
