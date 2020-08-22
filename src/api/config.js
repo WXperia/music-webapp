@@ -11,3 +11,5 @@ export const options = {
   prefix: 'jp'
 }
 export const ERR_OK = 0
+
+export const MY_PATH = 'http://music.wxperia.com:9000'
