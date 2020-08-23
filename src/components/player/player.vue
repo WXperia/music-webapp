@@ -96,11 +96,12 @@
             <i class="icon-mini" @click.stop="togglePlaying" :class="minIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <play-list ref="playlist"></play-list>
     <audio
       ref="audio"
       :src="currentSong.url"
@@ -113,6 +114,7 @@
 </template>
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import PlayList from 'components/playlist/playlist'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import { playMode } from 'common/js/config'
@@ -149,6 +151,9 @@ export default {
       setPlayList: 'SET_PLAYLIST'
     }),
     ...mapActions(['changePlaySong']),
+    showPlayList () {
+      this.$refs.playlist.show()
+    },
     middleTouchStart (e) {
       this.touch.initiated = true
       const touches = e.touches[0]
@@ -465,7 +470,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    PlayList
   }
 }
 </script>
