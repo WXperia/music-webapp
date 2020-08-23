@@ -6,31 +6,38 @@
           <h1 class="title">
             <i class="icon"></i>
             <span class="text"></span>
-            <span class="clear"><i class="icon-clear"></i></span>
+            <span class="clear">
+              <i class="icon-clear"></i>
+            </span>
           </h1>
         </div>
-        <div class="list-content">
+        <scroll ref="scroll" :data="sequenceList" class="list-content">
           <ul>
-              <li class="item" v-for="(item, index) in sequenceList" :key="index">
-                  <i class="current"></i>
-                  <span class="text">{{item.name}}</span>
-                  <span class="like">
-                      <i class="icon-not-favorite"></i>
-                  </span>
-                  <span class="delete">
-                      <i class="icon-delete"></i>
-                  </span>
-              </li>
+            <li
+              class="item"
+              @click="selectItem(item)"
+              v-for="(item, index) in sequenceList"
+              :key="index"
+            >
+              <i class="current" :class="getCurrentIcon(item)"></i>
+              <span class="text">{{item.name}}</span>
+              <span class="like">
+                <i class="icon-not-favorite"></i>
+              </span>
+              <span class="delete">
+                <i class="icon-delete"></i>
+              </span>
+            </li>
           </ul>
-        </div>
+        </scroll>
         <div class="list-operate">
-            <div class="add">
-                <i class="icon-add"></i>
-                <span class="text">添加歌曲到队列</span>
-            </div>
+          <div class="add">
+            <i class="icon-add"></i>
+            <span class="text">添加歌曲到队列</span>
+          </div>
         </div>
         <div class="list-close" @click.stop="hide">
-            <span>关闭</span>
+          <span>关闭</span>
         </div>
       </div>
     </div>
@@ -38,7 +45,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { playMode } from 'common/js/config'
+import Scroll from 'base/scroll/scroll'
 export default {
   data () {
     return {
@@ -46,15 +55,40 @@ export default {
     }
   },
   methods: {
+    selectItem (item, index) {
+      if (this.mode === playMode.random) {
+        index = this.playlist.findIndex((song) => {
+          return song.id === item.id
+        })
+      }
+      this.changePlaySong(index)
+    },
     show () {
       this.showFlag = true
+      setTimeout(() => {
+        this.$refs.scroll.refresh()
+      })
     },
     hide () {
       this.showFlag = false
-    }
+    },
+    getCurrentIcon (item) {
+      if (this.currentSong.id === item.id) {
+        return 'icon-play'
+      } else {
+        return ''
+        }
+    },
+    ...mapMutations({
+      setCurretnIndex: 'SET_CURRENT_INDEX'
+    }),
+    ...mapActions(['changePlaySong'])
   },
   computed: {
-    ...mapGetters(['sequenceList'])
+    ...mapGetters(['sequenceList', 'currentSong', 'playlist'])
+  },
+  components: {
+    Scroll
   }
 }
 </script>
