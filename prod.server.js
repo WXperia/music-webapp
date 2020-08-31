@@ -5,11 +5,8 @@ var axios = require('axios')
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
 var csrf = require('xsrf')
-
 var port = process.env.PORT || config.build.port
-
 var app = express()
-
 var csrfProtection = csrf({
   cookie: true,
   ignoreMethods: ['HEAD', 'OPTIONS'],
@@ -17,7 +14,6 @@ var csrfProtection = csrf({
 })
 app.use(cookieParser())
 app.use(csrfProtection)
-
 var apiRoutes = express.Router()
 
 apiRoutes.get('/getDiscList', csrfProtection, function (req, res) {
