@@ -4,14 +4,14 @@ var config = require('./config/index')
 var axios = require('axios')
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
-var csrf = require('xsrf')
+// var csrf = require('xsrf')
 var port = process.env.PORT || config.build.port
 var app = express()
-var csrfProtection = csrf({
-  cookie: true,
-  ignoreMethods: ['HEAD', 'OPTIONS'],
-  checkPathReg: /^\/api/
-})
+// var csrfProtection = csrf({
+//   cookie: true,
+//   ignoreMethods: ['HEAD', 'OPTIONS'],
+//   checkPathReg: /^\/api/
+// })
 app.use(cookieParser())
 // app.use(csrfProtection)
 
