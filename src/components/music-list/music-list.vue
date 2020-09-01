@@ -97,9 +97,10 @@ const backdrop = prefixStyle('backdrop-filter')
                 })
             },
             random () {
-
+                console.log(this.songs)
+                this.randomPlay(this.songs)
             },
-            ...mapActions(['selectPlay'])
+            ...mapActions(['selectPlay', 'randomPlay'])
         },
         components: {
             Scroll, SongList, Loading

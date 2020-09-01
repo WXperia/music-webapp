@@ -4,7 +4,7 @@
       <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
-            <i class="icon"></i>
+            <i class="icon" :class="iconMode" @click.stop="changeMode"></i>
             <span class="text"></span>
             <span class="clear" @click="showConfirm">
               <i class="icon-clear"></i>
@@ -14,12 +14,12 @@
         <scroll ref="listContent" :data="sequenceList" class="list-content">
           <transition-group name="list" tag="ul">
             <li
-              class="item"
-              @click="selectItem(item,index)"
-              v-for="(item,index) in sequenceList"
-              :key="item.id"
-              ref="listItem"
-            >
+                class="item"
+                ref="listItem"
+                @click="selectItem(item,index)"
+                v-for="(item,index) in sequenceList"
+                :key="item.id"
+              >
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
@@ -57,7 +57,9 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { playMode } from 'common/js/config'
 import Scroll from 'base/scroll/scroll'
 import Confirm from 'base/confirm/confirm'
+import { playerMixin } from 'common/js/mixin'
 export default {
+  mixins: [playerMixin],
   data () {
     return {
       showFlag: false
@@ -80,6 +82,8 @@ export default {
       const index = this.sequenceList.findIndex(song => {
         return current.id === song.id
       })
+      console.log(index)
+      console.log(this.$refs.listItem)
       this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
     },
     selectItem (item, index) {
@@ -95,8 +99,9 @@ export default {
       this.showFlag = true
       setTimeout(() => {
         this.$refs.listContent.refresh()
+        console.log(this.$refs.listItem)
         this.scrollToCurrent(this.currentSong)
-      })
+      }, 300)
     },
     hide () {
       this.showFlag = false
@@ -118,7 +123,7 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
-      if (!this.showFlag) {
+      if (this.showFlag) {
         this.scrollToCurrent(newSong)
     }
     }
