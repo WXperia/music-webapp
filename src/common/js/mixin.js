@@ -89,8 +89,7 @@ export const playerMixin = {
     ...mapActions([
       'saveFavoriteList',
       'deleteFavoriteList',
-      'changePlaySong',
-      'randomPlay'
+      'changePlaySong'
     ])
   }
 }

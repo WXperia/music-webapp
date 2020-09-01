@@ -5,7 +5,7 @@
         <div class="list-header">
           <h1 class="title">
             <i class="icon" :class="iconMode" @click.stop="changeMode"></i>
-            <span class="text"></span>
+            <span class="text">{{modeText}}</span>
             <span class="clear" @click="showConfirm">
               <i class="icon-clear"></i>
             </span>
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 import { playMode } from 'common/js/config'
 import Scroll from 'base/scroll/scroll'
 import Confirm from 'base/confirm/confirm'
@@ -116,10 +116,12 @@ export default {
     ...mapMutations({
       setCurretnIndex: 'SET_CURRENT_INDEX'
     }),
-    ...mapActions(['changePlaySong', 'deleteSong', 'deleteSongList'])
+    ...mapActions(['deleteSong', 'deleteSongList'])
   },
   computed: {
-    ...mapGetters(['sequenceList', 'currentSong', 'playlist'])
+    modeText () {
+      return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : this.mode === playMode.loop ? '单曲循环' : '你整了个错误的播放模式'
+    }
   },
   watch: {
     currentSong (newSong, oldSong) {

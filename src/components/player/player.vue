@@ -113,7 +113,7 @@
   </div>
 </template>
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import PlayList from 'components/playlist/playlist'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
@@ -145,14 +145,10 @@ export default {
   methods: {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-      // setPlayingState: 'SET_PLAYING_STATE',
-      // setCurrentIndex: 'SET_CURRENT_INDEX',
       setReadyPlayState: 'SET_READYPLAY_STATE',
-      // setPlayMode: 'SET_PLAY_MODE',
       setSequenceList: 'SET_SEQUENCE_LIST'
-      // setPlayList: 'SET_PLAYLIST'
     }),
-    ...mapActions(['changePlaySong']),
+    // ...mapActions(['changePlaySong']),
     showPlayList () {
       this.$refs.playlist.show()
     },
@@ -438,13 +434,9 @@ export default {
   computed: {
     ...mapGetters([
       'fullScreen',
-      'playlist',
-      'currentSong',
       'playing',
       'currentIndex',
-      'readyPlay',
-      'mode',
-      'sequenceList'
+      'readyPlay'
     ]),
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
@@ -461,13 +453,6 @@ export default {
     percent () {
       return this.currentTime / this.currentSong.duration
     }
-    // iconMode () {
-    //   return this.mode === playMode.sequence
-    //     ? 'icon-sequence'
-    //     : this.mode === playMode.loop
-    //     ? 'icon-loop'
-    //     : 'icon-random'
-    // }
   },
   components: {
     ProgressBar,
