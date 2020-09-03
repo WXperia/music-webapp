@@ -32,23 +32,24 @@
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
         </div>
-        <div class="list-close" @click.stop="hide">
+        <div class="list-close" @click="hide">
           <span>关闭</span>
         </div>
       </div>
-    </div>
-    <confirm
-       ref="confirm"
+       <confirm
+      ref="confirm"
       :confirmBtnText="'清空'"
       :text="'是否清空播放列表？'"
       @cancel="handlerCancel"
       @confirm="handlerConfirm"
     ></confirm>
+    <add-song ref="addSong"></add-song>
+    </div>
   </transition>
 </template>
 
@@ -57,6 +58,7 @@ import { mapMutations, mapActions } from 'vuex'
 import { playMode } from 'common/js/config'
 import Scroll from 'base/scroll/scroll'
 import Confirm from 'base/confirm/confirm'
+import AddSong from 'components/add-song/add-song'
 import { playerMixin } from 'common/js/mixin'
 export default {
   mixins: [playerMixin],
@@ -66,8 +68,16 @@ export default {
     }
   },
   methods: {
+    addSong () {
+      this.$nextTick(() => {
+          this.$refs.addSong.show()
+        })
+    },
     showConfirm () {
-      this.$refs.confirm.show()
+      this.$nextTick(() => {
+        console.log(this.$refs.confirm)
+          this.$refs.confirm.show()
+        })
     },
     handlerCancel () {
 
@@ -82,8 +92,6 @@ export default {
       const index = this.sequenceList.findIndex(song => {
         return current.id === song.id
       })
-      console.log(index)
-      console.log(this.$refs.listItem)
       this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
     },
     selectItem (item, index) {
@@ -99,7 +107,6 @@ export default {
       this.showFlag = true
       setTimeout(() => {
         this.$refs.listContent.refresh()
-        console.log(this.$refs.listItem)
         this.scrollToCurrent(this.currentSong)
       }, 300)
     },
@@ -132,7 +139,8 @@ export default {
   },
   components: {
     Scroll,
-    Confirm
+    Confirm,
+    AddSong
   }
 }
 </script>

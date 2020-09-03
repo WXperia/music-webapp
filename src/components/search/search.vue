@@ -29,7 +29,7 @@
        </div>
       </scroll>
     </div>
-    <div ref="searchResult" class="search-result" v-show="query">
+    <div ref="shortcutResult" class="search-result" v-show="query">
       <suggest @select="saveSearch" ref="suggest" @listScroll="blurInput" :query="query"></suggest>
     </div>
     <confirm :text="'是否清空记录?'" @confirm="confirmHandler" ref="confirm"></confirm>
@@ -42,13 +42,14 @@ import SearchBox from 'base/search-box/search-box'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
 import Suggest from 'components/suggest/suggest'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import searchList from 'base/search-list/search-list'
 import confirm from 'base/confirm/confirm'
 import Scroll from 'base/scroll/scroll'
-import { playlistMixin } from 'common/js/mixin'
+import { playlistMixin, searchMixin } from 'common/js/mixin'
+// import {  } from 'common/jsm'
 export default {
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   data () {
     return {
       hotKey: [],
@@ -76,15 +77,15 @@ export default {
     confirmHandler () {
        this.clearSearchHistory()
     },
-    saveSearch (item) {
-      this.saveSearchHistory(this.query)
-    },
-    blurInput () {
-      this.$refs.searchBox.blur()
-    },
-    addQuery (query) {
-      this.$refs.searchBox.setQuery(query)
-    },
+    // saveSearch (item) {
+    //   this.saveSearchHistory(this.query)
+    // },
+    // blurInput () {
+    //   this.$refs.searchBox.blur()
+    // },
+    // addQuery (query) {
+    //   this.$refs.searchBox.setQuery(query)
+    // },
     // deleteQuery (query) {
     //   this.deleteSearchHistory(query)
     // },
@@ -105,7 +106,7 @@ export default {
         console.log(e)
       }
     },
-    ...mapActions(['saveSearchHistory', 'deleteSearchHistory', 'clearSearchHistory'])
+    ...mapActions(['clearSearchHistory'])
   },
   watch: {
     query (newQuery) {
@@ -117,7 +118,7 @@ export default {
     }
    },
   computed: {
-    ...mapGetters(['searchHistory']),
+    // ...mapGetters(['searchHistory']),
     shortCut () {
       return this.hotKey.concat(this.searchHistory)
     }
