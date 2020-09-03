@@ -109,11 +109,12 @@
       @error="audioError"
       @timeupdate="upDateTime"
       @ended="end"
+      @playing="ready"
     ></audio>
   </div>
 </template>
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import PlayList from 'components/playlist/playlist'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
@@ -148,7 +149,7 @@ export default {
       setReadyPlayState: 'SET_READYPLAY_STATE',
       setSequenceList: 'SET_SEQUENCE_LIST'
     }),
-    // ...mapActions(['changePlaySong']),
+    ...mapActions(['savePlayHistory']),
     showPlayList () {
       this.$refs.playlist.show()
     },
@@ -158,8 +159,18 @@ export default {
       this.touch.startX = touches.pageX
       this.touch.startY = touches.pageY
     },
+    ready () {
+        clearTimeout(this.timer)
+        // 监听 playing 这个事件可以确保慢网速或者快速切换歌曲导致的 DOM Exception
+        this.songReady = true
+        this.canLyricPlay = true
+        this.savePlayHistory(this.currentSong)
+        // 如果歌曲的播放晚于歌词的出现，播放的时候需要同步歌词
+        if (this.currentLyric && !this.isPureMusic) {
+          this.currentLyric.seek(this.currentTime * 1000)
+        }
+      },
     middleTouchMove (e) {
-      console.log('move')
       if (!this.touch.initiated) {
         return false
       }
@@ -223,7 +234,6 @@ export default {
         if (this.playing) {
           this.currentLyric.play()
         }
-        console.log(this.currentLyric)
       } catch (e) {
         this.currentLyric = null
         this.playingLyric = ''
@@ -284,6 +294,7 @@ export default {
       this.setReadyPlayState(true)
     },
     audioError () {
+      clearTimeout(this.timer)
       this.setReadyPlayState(false)
     },
     togglePlaying () {
@@ -415,11 +426,19 @@ export default {
       if (newSong.id === oldSong) return
       if (this.currentLyric) {
         this.currentLyric.stop()
+        this.currentLyric = null
+        this.currentTime = 0
+        this.playingLyric = ''
+        this.currentLineNum = 0
       }
       this.$nextTick(() => {
         this.getLyric()
         this.$refs.audio.play()
       })
+      clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.songReady = true
+        }, 5000)
     },
     playing (newPlaying) {
       this.$nextTick(() => {
