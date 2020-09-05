@@ -11,17 +11,17 @@
             </span>
           </h1>
         </div>
-        <scroll ref="listContent" :data="sequenceList" class="list-content">
-          <transition-group name="list" tag="ul">
+        <scroll :refreshDelay="refreshDelay" ref="listContent" :data="sequenceList" class="list-content">
+          <transition-group ref="list" name="list" tag="ul">
             <li
                 class="item"
                 ref="listItem"
+                :key="item.id"
                 @click="selectItem(item,index)"
                 v-for="(item,index) in sequenceList"
-                :key="item.id"
               >
               <i class="current" :class="getCurrentIcon(item)"></i>
-              <span class="text">{{item.name}}</span>
+              <span class="text" v-html="item.name"></span>
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
@@ -64,18 +64,16 @@ export default {
   mixins: [playerMixin],
   data () {
     return {
-      showFlag: false
+      showFlag: false,
+      refreshDelay: 120
     }
   },
   methods: {
     addSong () {
-      this.$nextTick(() => {
-          this.$refs.addSong.show()
-        })
+      this.$refs.addSong.show()
     },
     showConfirm () {
       this.$nextTick(() => {
-        console.log(this.$refs.confirm)
           this.$refs.confirm.show()
         })
     },
@@ -92,23 +90,24 @@ export default {
       const index = this.sequenceList.findIndex(song => {
         return current.id === song.id
       })
-      this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+      console.log(index)
+      this.$refs.listContent.scrollToElement(this.$refs.list.$el.children[index], 300)
     },
     selectItem (item, index) {
-      let _index = index
       if (this.mode === playMode.random) {
-        _index = this.playlist.findIndex((song) => {
+        index = this.playlist.findIndex((song) => {
           return song.id === item.id
         })
       }
-      this.changePlaySong(_index)
+      this.setCurrentIndex(index)
+      this.setPlayingState(true)
     },
     show () {
       this.showFlag = true
       setTimeout(() => {
         this.$refs.listContent.refresh()
         this.scrollToCurrent(this.currentSong)
-      }, 300)
+      }, 20)
     },
     hide () {
       this.showFlag = false
@@ -132,9 +131,12 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
-      if (this.showFlag) {
-        this.scrollToCurrent(newSong)
-    }
+      if (!this.showFlag || newSong.id === oldSong.id) {
+          return
+        }
+        setTimeout(() => {
+          this.scrollToCurrent(newSong)
+        }, 20)
     }
   },
   components: {

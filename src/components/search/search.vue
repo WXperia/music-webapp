@@ -4,7 +4,7 @@
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div class="shortcut-wrapper" ref="shortcutWrapper" v-show="!query">
-      <scroll ref="shortcut" class="shortcut" :data="shortCut">
+      <scroll :refreshDelay="refreshDelay" ref="shortcut" class="shortcut" :data="shortCut">
        <div>
           <div class="hot-key">
           <h1 class="title">热门搜索</h1>
@@ -52,8 +52,7 @@ export default {
   mixins: [playlistMixin, searchMixin],
   data () {
     return {
-      hotKey: [],
-      query: ''
+      hotKey: []
     }
   },
   components: {
@@ -77,23 +76,8 @@ export default {
     confirmHandler () {
        this.clearSearchHistory()
     },
-    // saveSearch (item) {
-    //   this.saveSearchHistory(this.query)
-    // },
-    // blurInput () {
-    //   this.$refs.searchBox.blur()
-    // },
-    // addQuery (query) {
-    //   this.$refs.searchBox.setQuery(query)
-    // },
-    // deleteQuery (query) {
-    //   this.deleteSearchHistory(query)
-    // },
     clearQuery () {
       this.$refs.confirm.show()
-    },
-    onQueryChange (query) {
-      this.query = query
     },
     async _getHotKey () {
       try {
@@ -118,7 +102,6 @@ export default {
     }
    },
   computed: {
-    // ...mapGetters(['searchHistory']),
     shortCut () {
       return this.hotKey.concat(this.searchHistory)
     }

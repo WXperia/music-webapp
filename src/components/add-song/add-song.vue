@@ -46,6 +46,12 @@
           @listScroll="blurInput"
         ></suggest>
       </div>
+      <top-tip ref="topTip" :delay="topTipDelay">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放列表</span>
+        </div>
+      </top-tip>
     </div>
   </transition>
 </template>
@@ -59,6 +65,7 @@ import SongList from 'base/song-list/song-list'
 import SearchList from 'base/search-list/search-list'
 import { mapGetters, mapActions } from 'vuex'
 import Song from 'common/js/song'
+import TopTip from 'base/top-tip/top-tip'
 export default {
   mixins: [searchMixin],
   data () {
@@ -67,12 +74,14 @@ export default {
       showSinger: false,
       currentIndex: 0,
       switches: [{ name: '最近播放' }, { name: '搜索历史' }],
-      refreshDelay: 200
+      refreshDelay: 200,
+      topTipDelay: 1000
     }
   },
   methods: {
     show () {
       this.showFlag = true
+      this.refreshList()
     },
     hide () {
       this.showFlag = false
@@ -82,6 +91,7 @@ export default {
     },
     selectSuggest () {
       this.saveSearch()
+      this.$refs.topTip.show()
     },
     refreshList () {
         setTimeout(() => {
@@ -95,7 +105,7 @@ export default {
     switchItem (index) {
       this.currentIndex = index
     },
-    selectSong (index, song) {
+    selectSong (song, index) {
       if (index !== 0) {
         this.insertSong(new Song(song))
         this.$refs.topTip.show()
@@ -112,7 +122,8 @@ export default {
     Switches,
     Scroll,
     SongList,
-    SearchList
+    SearchList,
+    TopTip
   }
 }
 </script>
