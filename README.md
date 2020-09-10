@@ -35,9 +35,26 @@
   - 随机播放，顺序播放，单曲循环，插入播放，稍后播放
   - 实时歌词显示
   - 播放列表显示
-### **计划实现的功能**
 - 添加喜欢的歌曲
-- 下载歌曲
-- 使用新api解决qq音乐下载限制
+### **有空就做**
+
+- 下载歌曲 
+- 使用新api解决qq音乐下载限制 
 
 ### **部分页面展示**
+
+- 首页
+
+![首页](https://blog-status.oss-cn-beijing.aliyuncs.com/blog/img/20200910210158.png)
+
+- 歌手列表
+
+![歌手列表](https://blog-status.oss-cn-beijing.aliyuncs.com/blog/img/20200910210455.png)
+
+- 榜单
+
+![榜单](https://blog-status.oss-cn-beijing.aliyuncs.com/blog/img/20200910210533.png)
+
+- 搜索
+
+![搜索](https://blog-status.oss-cn-beijing.aliyuncs.com/blog/img/20200910210612.png)

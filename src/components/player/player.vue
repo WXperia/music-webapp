@@ -162,7 +162,7 @@ export default {
     ready () {
         clearTimeout(this.timer)
         // 监听 playing 这个事件可以确保慢网速或者快速切换歌曲导致的 DOM Exception
-        this.songReady = true
+        this.setReadyPlayState(true)
         this.canLyricPlay = true
         this.savePlayHistory(this.currentSong)
         // 如果歌曲的播放晚于歌词的出现，播放的时候需要同步歌词
@@ -230,6 +230,9 @@ export default {
     async getLyric () {
       try {
         let res = await this.currentSong.getLyric()
+        if (this.currentSong.lyric !== res) {
+          return
+        }
         this.currentLyric = new Lyric(res, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -327,6 +330,10 @@ export default {
     },
     next () {
       if (!this.readyPlay) return
+      if (this.playlist.length === 1) {
+        this.loop()
+        return false
+      }
       if (this.mode === playMode.loop) {
         this.loop()
       } else {
@@ -431,14 +438,11 @@ export default {
         this.playingLyric = ''
         this.currentLineNum = 0
       }
-      this.$nextTick(() => {
-        this.getLyric()
-        this.$refs.audio.play()
-      })
       clearTimeout(this.timer)
         this.timer = setTimeout(() => {
-          this.songReady = true
-        }, 5000)
+          this.getLyric()
+          this.$refs.audio.play()
+      }, 1000)
     },
     playing (newPlaying) {
       this.$nextTick(() => {
